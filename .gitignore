@@ -1,0 +1,4 @@
+node_modules
+public/*/**
+!public/users/.gitkeep
+!public/documents/.gitkeep
