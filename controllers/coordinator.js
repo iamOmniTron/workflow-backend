@@ -1,5 +1,6 @@
 const db = require("../models");
 const z = require("zod");
+const  path = require("path");
 const { hashPassword } = require("../utilities/helpers");
 
 
@@ -87,6 +88,26 @@ module.exports = {
                 message:"coordinator deleted successfully"
             })
         }  catch (error) {
+            return next(error);
+        }
+    },
+    uploadCoordinatorImage: async(req,res,next)=>{
+        try {
+            const {userId} = req;
+            const file = req.file;
+            const imageUrl = file.path.replace(/\\/g, "/").substring(7);
+            const isUpdated = await db.Coordinator.update({imageUrl},{where:{id:userId}});
+
+            if(!isUpdated) return res.json({
+                success:false,
+                message:"Cannot update profile image"
+            });
+
+            return res.json({
+                success:true,
+                message:"profile image updated successfully"
+            })
+        } catch (error) {
             return next(error);
         }
     }

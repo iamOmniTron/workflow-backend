@@ -22,6 +22,11 @@ module.exports = {
             if(!isCreated) return res.json({
                 success:false,
                 message:"cannot create document"
+            });
+
+            return res.json({
+                success:true,
+                message:"document uploaded successfully"
             })
         } catch (error) {
             return next(error);
@@ -29,7 +34,7 @@ module.exports = {
     },
     getAllDocument: async (req,res,next)=>{
         try {
-            const documents = await db.Document.findAll({include:[{model:db.User},{model:db.DocumentType}]});
+            const documents = await db.Document.findAll({include:[{model:db.Comment},{model:db.User},{model:db.DocumentType}]});
             return res.json({
                 success:true,
                 data:documents
@@ -48,7 +53,10 @@ module.exports = {
                             id:userId
                         },required:true
                     }]
-                }]},{model:db.DocumentType}
+                }]},{model:db.DocumentType},
+                {
+                    model:db.Comment
+                }
             ]});
             return res.json({
                 success:true,

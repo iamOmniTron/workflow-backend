@@ -3,13 +3,14 @@ const { loginUser, loginDepartmentalCoordinator, loginPGAdmin, profile } = requi
 const {auth} = require("../middlewares");
 const { createFaculty, updateFaculty, getFaculties, deleteFaculties } = require("../controllers/faculties");
 const { updateDepartment,createDepartment,getDepartments,deleteDepartments } = require("../controllers/department");
-const { createStudent, updateUser, getAllUser, deleteUser, searchByMatric, getDepartmentalUser} = require("../controllers/students");
-const { createCoordinator, updateCoordinator, getCoordinators } = require("../controllers/coordinator");
+const { createStudent, updateUser,uploadStudentImage, getAllUser, deleteUser, searchByMatric, getDepartmentalUser} = require("../controllers/students");
+const { createCoordinator, updateCoordinator, getCoordinators, uploadCoordinatorImage } = require("../controllers/coordinator");
 const { createDocumentType, updateDocumentType, getDocumentTypes } = require("../controllers/docType");
 const { createDocument, getDepartmentalDocuments, getAllDocument, deleteDocument } = require("../controllers/documents");
 const { updateMemo, getAllMemo, getStudentMemos, getCoordinatorMemo, createMemo } = require("../controllers/memo");
 const { createApplication, getAllApplications, getDepartmentApplications, getMyApplication, approveApplication, rejectApplication } = require("../controllers/application");
-const {upload} = require("../utilities/helpers");
+const {uploadDocument,uploadImage} = require("../utilities/helpers");
+const { createComment, updateComment, getAllDocumentComments, getAllStudentComments, deleteComment } = require("../controllers/comment");
 
 
 const router = Router();
@@ -46,12 +47,14 @@ router.get("/user/get-all",auth,getAllUser);
 router.delete("/user/delete/:userId",auth,deleteUser);
 router.get("/user/find/:matricNumber",searchByMatric);
 router.get("/user/department",auth,getDepartmentalUser);
+router.post("/user/image",auth,uploadImage.single("image"),uploadStudentImage)
 
 
 // COORDINATOR
 router.post("/coordinator/create",auth,createCoordinator);
 router.put("/coordinator/update/:coordinatorId",auth,updateCoordinator);
 router.get("/coordinator/get-all",auth,getCoordinators);
+router.post("/coordinator/image",auth,uploadImage.single("image"),uploadCoordinatorImage);
 
 
 // DOCUMENT TYPE
@@ -61,7 +64,7 @@ router.get("/doc-type/get-all",auth,getDocumentTypes);
 
 
 // DOCUMENTS
-router.post("/document/create",auth,upload.single("file"),createDocument);
+router.post("/document/create",auth,uploadDocument.single("file"),createDocument);
 router.get("/document/department",auth,getDepartmentalDocuments);
 router.get("/document/get-all",auth,getAllDocument);
 router.delete("/document/delete/:documentId",auth,deleteDocument);
@@ -85,5 +88,12 @@ router.put("/application/approve/:applicationId",auth,approveApplication);
 router.put("/application/reject/:applicationId",auth,rejectApplication);
 
 
+
+// COMMENTS
+router.post("/comment/create",auth,createComment);
+router.put("/comment/update/:commentId",auth,updateComment);
+router.get("/comment/document/:documentId",auth,getAllDocumentComments);
+router.get("/comment/student/:studentId",auth,getAllStudentComments);
+router.delete("/comment/delete/:commentId",auth,deleteComment);
 
 module.exports = router;

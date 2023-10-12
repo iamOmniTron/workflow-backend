@@ -1,5 +1,6 @@
 const db = require("../models");
 const z = require("zod");
+const  path = require("path");
 const { hashPassword } = require("../utilities/helpers");
 
 
@@ -64,7 +65,12 @@ module.exports = {
     },
     getAllUser: async (req,res,next)=>{
         try {
-            const users = await db.User.findAll();
+            const users = await db.User.findAll({
+                include:[{
+                    model:db.Department
+                },{model:db.Document,include:[{model:db.DocumentType}]},
+                {model:db.Application}]
+            });
             return res.json({
                 success:true,
                 data:users
@@ -118,6 +124,26 @@ module.exports = {
             return res.json({
                 success:true,
                 data:user
+            })
+        } catch (error) {
+            return next(error);
+        }
+    },
+    uploadStudentImage: async(req,res,next)=>{
+        try {
+            const {userId} = req;
+            const file = req.file;
+            const imageUrl = file.path.replace(/\\/g, "/").substring(7);
+            const isUpdated = await db.User.update({imageUrl},{where:{id:userId}});
+
+            if(!isUpdated) return res.json({
+                success:false,
+                message:"Cannot update profile image"
+            });
+
+            return res.json({
+                success:true,
+                message:"profile image updated successfully"
             })
         } catch (error) {
             return next(error);
